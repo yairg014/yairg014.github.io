@@ -6,7 +6,7 @@
 <title>Locura Nocturna</title>
 <style>
 body{font-family:system-ui,sans-serif;background:#14101c;color:#eee;max-width:34rem;margin:3rem auto;padding:0 1rem;line-height:1.5}
-a{color:#b48cff}#ayuda{display:none}
+a{color:#b48cff}
 .bajar{display:block;margin:1.2rem 0;padding:.9rem 1rem;border-radius:.6rem;background:#e91e63;color:#fff;font-weight:700;text-align:center;text-decoration:none}
 small{color:#b9b3c6}
 </style>
@@ -21,9 +21,8 @@ small{color:#b9b3c6}
   <p><small>¿Ya lo tienes? / Already installed? <a href="locuranocturna://join">Abrir de nuevo / Open again</a></small></p>
 </div>
 <script>
-location.href = "locuranocturna://join"; // si el enlace no existe, el navegador no hace nada
-// siempre se muestra: el diálogo del navegador o cambiar de ventana también quitan el foco y ocultaban la instalación
-setTimeout(function () { document.getElementById("ayuda").style.display = "block"; }, 2000);
+// la instalación ya se ve sin depender de esto: Opera puede detener la página al probar un enlace desconocido
+setTimeout(function () { location.href = "locuranocturna://join"; }, 300);
 </script>
 </body>
 </html>
