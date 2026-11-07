@@ -21,10 +21,9 @@ small{color:#b9b3c6}
   <p><small>¿Ya lo tienes? / Already installed? <a href="locuranocturna://join">Abrir de nuevo / Open again</a></small></p>
 </div>
 <script>
-var abrio = false; // si la app abre, la pestaña pierde el foco y no hace falta mostrar la instalación
-addEventListener("blur", function () { abrio = true; });
 location.href = "locuranocturna://join"; // si el enlace no existe, el navegador no hace nada
-setTimeout(function () { if (!abrio) document.getElementById("ayuda").style.display = "block"; }, 2000);
+// siempre se muestra: el diálogo del navegador o cambiar de ventana también quitan el foco y ocultaban la instalación
+setTimeout(function () { document.getElementById("ayuda").style.display = "block"; }, 2000);
 </script>
 </body>
 </html>
