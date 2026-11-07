@@ -7,18 +7,24 @@
 <style>
 body{font-family:system-ui,sans-serif;background:#14101c;color:#eee;max-width:34rem;margin:3rem auto;padding:0 1rem;line-height:1.5}
 a{color:#b48cff}#ayuda{display:none}
+.bajar{display:block;margin:1.2rem 0;padding:.9rem 1rem;border-radius:.6rem;background:#e91e63;color:#fff;font-weight:700;text-align:center;text-decoration:none}
+small{color:#b9b3c6}
 </style>
 </head>
 <body>
 <h1>Abriendo Locura Nocturna&hellip; / Opening&hellip;</h1>
 <div id="ayuda">
-  <p><b>ES:</b> ¿No pasó nada? Instálalo una vez: en Discord, canal Preguntas・FAQ, toca <b>Cómo instalar</b>, abre <code>Instalar.bat</code> y vuelve a tocar el botón.</p>
-  <p><b>EN:</b> Nothing happened? Install it once: in Discord, Preguntas・FAQ channel, tap <b>How to install</b>, open <code>Instalar.bat</code> and tap the button again.</p>
-  <p><a href="locuranocturna://join">locuranocturna://join</a></p>
+  <p><b>¿Es tu primera vez? / First time?</b><br>Descarga el acceso, ábrelo y acepta. Entras solo. / Download it, open it and accept. You join by itself.</p>
+  <a class="bajar" href="LocuraNocturna.exe" download>Descargar e instalar / Download and install</a>
+  <p><small>Pide tu permiso antes de instalar y no necesita administrador. Al no tener firma, tu navegador y Windows pueden avisar: elige <b>Conservar</b> y luego <b>Más información &gt; Ejecutar de todas formas</b>. Necesitas Roblox Studio. Solo se hace una vez.</small></p>
+  <p><small>It asks for your permission before installing and needs no admin rights. It is unsigned, so your browser and Windows may warn you: choose <b>Keep</b>, then <b>More info &gt; Run anyway</b>. You need Roblox Studio. You only do this once.</small></p>
+  <p><small>¿Ya lo tienes? / Already installed? <a href="locuranocturna://join">Abrir de nuevo / Open again</a></small></p>
 </div>
 <script>
-location.href = "locuranocturna://join"; // si el protocolo no existe, el navegador no hace nada
-setTimeout(function () { document.getElementById("ayuda").style.display = "block"; }, 2000);
+var abrio = false; // si la app abre, la pestaña pierde el foco y no hace falta mostrar la instalación
+addEventListener("blur", function () { abrio = true; });
+location.href = "locuranocturna://join"; // si el enlace no existe, el navegador no hace nada
+setTimeout(function () { if (!abrio) document.getElementById("ayuda").style.display = "block"; }, 2000);
 </script>
 </body>
 </html>
