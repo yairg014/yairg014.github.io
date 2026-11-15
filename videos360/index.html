@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<title>Día del Odontólogo 2026</title>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { --fondo:#12101a; --panel:#1d1a29; --borde:#3a3550; --texto:#f4f0e6; --suave:#b9b3c9; --oro:#e8c46a; --oro2:#c9a24a; --error:#ffb4a8; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; background: radial-gradient(ellipse at top, #2a2340 0%, var(--fondo) 60%); color:var(--texto);
+         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height:1.5; }
+  main { max-width:480px; margin:0 auto; padding:28px 16px 40px; }
+  header { text-align:center; margin-bottom:24px; }
+  .adorno { color:var(--oro); letter-spacing:.5em; font-size:14px; }
+  h1 { margin:8px 0 12px; font-size:1.7rem; line-height:1.2; color:var(--oro); font-weight:700; overflow-wrap:anywhere; }
+  .bienvenida { margin:0; color:var(--texto); font-size:1.05rem; }
+  form { background:var(--panel); border:1px solid var(--borde); border-radius:16px; padding:18px; }
+  .fila { display:flex; gap:10px; }
+  .campo { display:flex; flex-direction:column; gap:6px; }
+  .campo.cod { width:96px; flex:none; }
+  .campo.num { flex:1; min-width:0; }
+  label { font-size:.9rem; color:var(--suave); }
+  input { width:100%; font-size:1.15rem; padding:12px; border-radius:10px; border:1px solid var(--borde); background:#12101a; color:var(--texto); }
+  input::placeholder { color:#8d86a0; }
+  :focus-visible { outline:3px solid var(--oro); outline-offset:2px; }
+  button, .boton { display:block; width:100%; margin-top:14px; padding:14px; font-size:1.1rem; font-weight:700; text-align:center; text-decoration:none;
+         border:0; border-radius:12px; background:linear-gradient(180deg, var(--oro), var(--oro2)); color:#1a1405; cursor:pointer; }
+  button[disabled] { opacity:.6; cursor:wait; }
+  #resultados { margin-top:22px; }
+  .todos { margin-bottom:18px; }
+  .todos button { margin-top:10px; }
+  .todos button:first-child { margin-top:0; }
+  .estado { text-align:center; color:var(--suave); padding:8px; }
+  .error { color:var(--error); }
+  .tarjeta { background:var(--panel); border:1px solid var(--borde); border-radius:16px; padding:14px; margin-bottom:18px; }
+  .etiqueta { display:inline-block; font-size:.8rem; font-weight:700; padding:3px 10px; border-radius:99px; border:1px solid var(--oro); color:var(--oro); margin-bottom:10px; }
+  iframe { width:100%; aspect-ratio:9/16; border:0; border-radius:10px; background:#000; display:block; }
+  .pie { margin-top:28px; text-align:center; font-size:.85rem; color:var(--suave); }
+  .pie + .pie { margin-top:8px; }
+  .pie a { color:var(--oro); font-weight:700; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="adorno" aria-hidden="true">✦ ✦ ✦</div>
+    <h1>Día del Odontólogo 2026</h1>
+    <p class="bienvenida">¡Bienvenido! Escribe el número de teléfono que diste al grabar tu video 360</p>
+  </header>
+
+  <form id="form" novalidate>
+    <div class="fila">
+      <div class="campo cod">
+        <label for="codigo">Código</label>
+        <input id="codigo" name="codigo" type="text" inputmode="tel" autocomplete="tel-country-code" value="+504" maxlength="5">
+      </div>
+      <div class="campo num">
+        <label for="numero">Teléfono</label>
+        <input id="numero" name="numero" type="text" inputmode="tel" autocomplete="tel-national" placeholder="9876 5432" maxlength="20" required>
+      </div>
+    </div>
+    <button type="submit" id="buscar">Buscar</button>
+  </form>
+
+  <div id="resultados" role="region" aria-live="polite" aria-label="Resultados"></div>
+
+  <p class="pie">Los videos se guardan por tiempo limitado; descárgalo pronto.</p>
+  <p class="pie">Cualquier duda, por favor contactar a <a href="tel:+50432694720">3269-4720</a></p>
+</main>
+
+<script>
+// Reemplaza google.script.run: misma interfaz, pero por fetch anónimo a la API.
+var API = 'https://script.google.com/macros/s/AKfycbzBNRbxucJKBi9EKDAcaEPdyMI0LGe_HA6INtebfxNgP4EKOFr5cLx2DUNiWxJi7HnL/exec';
+window.google = { script: { get run() {
+  var ok, mal, o = {
+    withSuccessHandler: function (f) { ok = f; return o; },
+    withFailureHandler: function (f) { mal = f; return o; },
+    buscarVideos: function (c, n) {
+      fetch(API + '?codigo=' + encodeURIComponent(c) + '&tel=' + encodeURIComponent(n), { credentials: 'omit' })
+        .then(function (r) { return r.json(); }).then(ok, mal);
+    }
+  };
+  return o;
+} } };
+</script>
+<script>
+(function () {
+  var form = document.getElementById('form');
+  var boton = document.getElementById('buscar');
+  var res = document.getElementById('resultados');
+
+  function mensaje(texto, esError) {
+    res.textContent = '';
+    var p = document.createElement('p');
+    p.className = 'estado' + (esError ? ' error' : '');
+    p.textContent = texto;
+    res.appendChild(p);
+  }
+
+  function tarjeta(v) {
+    var t = document.createElement('article');
+    t.className = 'tarjeta';
+    if (v.tipo === 'editado' || v.tipo === 'original') {
+      var e = document.createElement('span');
+      e.className = 'etiqueta';
+      e.textContent = v.tipo === 'editado' ? 'Editado' : 'Original';
+      t.appendChild(e);
+    }
+    var f = document.createElement('iframe');
+    f.src = v.vista;
+    f.loading = 'lazy';
+    f.title = 'Vista previa del video ' + v.nombre;
+    f.allow = 'autoplay; fullscreen';
+    f.setAttribute('allowfullscreen', '');
+    t.appendChild(f);
+    var a = document.createElement('a');
+    a.className = 'boton';
+    a.href = v.descarga;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = 'Descargar';
+    a.addEventListener('click', function (ev) { ev.preventDefault(); descargar(v); });
+    a.setAttribute('aria-label', 'Descargar video ' + v.nombre + (v.tamanoMB ? ' (' + v.tamanoMB + ' MB)' : ''));
+    t.appendChild(a);
+    return t;
+  }
+
+  // Cada descarga va en un iframe oculto: el navegador la guarda en el celular y sigue aunque se cierre la página.
+  function descargar(v) {
+    var f = document.createElement('iframe');
+    f.style.display = 'none';
+    f.src = v.descarga;
+    document.body.appendChild(f);
+  }
+
+  function botonesDescarga(videos) {
+    var caja = document.createElement('div');
+    caja.className = 'todos';
+    var p = document.createElement('p');
+    p.className = 'estado';
+    var editados = videos.filter(function (v) { return v.tipo === 'editado'; });
+    var botones = [];
+    function agregar(texto, lista) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = texto + ' (' + lista.length + ')';
+      b.addEventListener('click', function () {
+        botones.forEach(function (x) { x.disabled = true; });
+        p.textContent = 'Iniciando descargas… Si el navegador pregunta, toca "Permitir". Cuando empiecen, puedes cerrar la página.';
+        lista.forEach(function (v, i) {
+          setTimeout(function () {
+            descargar(v);
+            if (i === lista.length - 1) {
+              botones.forEach(function (x) { x.disabled = false; });
+              p.textContent = 'Listo: ' + lista.length + ' descargas iniciadas. Revisa tus descargas; siguen aunque cierres la página.';
+            }
+          }, i * 1000);
+        });
+      });
+      botones.push(b);
+      caja.appendChild(b);
+    }
+    if (videos.length > 1) agregar('Descargar todos', videos);
+    if (editados.length && editados.length < videos.length) agregar('Descargar solo editados', editados);
+    caja.appendChild(p);
+    return botones.length ? caja : null;
+  }
+
+  function terminar() { boton.disabled = false; boton.textContent = 'Buscar'; }
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var codigo = document.getElementById('codigo').value;
+    var numero = document.getElementById('numero').value;
+    if (!/\d{6,}/.test(numero.replace(/\D/g, ''))) {
+      mensaje('Escribe tu número de teléfono completo.', true);
+      return;
+    }
+    boton.disabled = true;
+    boton.textContent = 'Buscando…';
+    mensaje('Buscando tus videos…', false);
+    google.script.run
+      .withSuccessHandler(function (r) {
+        terminar();
+        if (!r || r.ok === false) { mensaje((r && r.mensaje) || 'Algo salió mal. Intenta de nuevo.', true); return; }
+        if (!r.videos || !r.videos.length) {
+          mensaje('No encontramos videos con ese número, puede que no esté registrado. Revisa que esté bien escrito o intenta con otro. Cualquier duda, por favor contactar a 3269-4720.', false);
+          return;
+        }
+        res.textContent = '';
+        var descargas = botonesDescarga(r.videos);
+        if (descargas) res.appendChild(descargas);
+        r.videos.forEach(function (v) { res.appendChild(tarjeta(v)); });
+      })
+      .withFailureHandler(function () {
+        terminar();
+        mensaje('No pudimos conectar. Revisa tu internet e intenta de nuevo.', true);
+      })
+      .buscarVideos(codigo, numero);
+  });
+})();
+</script>
+</body>
+</html>
