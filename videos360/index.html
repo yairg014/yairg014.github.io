@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<title>Día del Odontólogo 2026</title>
 <base target="_top">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Día del Odontólogo 2026</title>
 <style>
   :root { --fondo:#12101a; --panel:#1d1a29; --borde:#3a3550; --texto:#f4f0e6; --suave:#b9b3c9; --oro:#e8c46a; --oro2:#c9a24a; --error:#ffb4a8; }
   * { box-sizing: border-box; }
@@ -39,6 +39,8 @@
   .pie { margin-top:28px; text-align:center; font-size:.85rem; color:var(--suave); }
   .pie + .pie { margin-top:8px; }
   .pie a { color:var(--oro); font-weight:700; }
+  button.secundario { background:transparent; border:1px solid var(--borde); color:var(--suave); font-size:.95rem; font-weight:600; }
+  #formOrg { margin-top:12px; }
 </style>
 </head>
 <body>
@@ -63,6 +65,15 @@
     <button type="submit" id="buscar">Buscar</button>
   </form>
 
+  <button type="button" id="abrirOrg" class="secundario" aria-expanded="false" aria-controls="formOrg">Acceso organizador</button>
+  <form id="formOrg" hidden novalidate>
+    <div class="campo">
+      <label for="clave">Contraseña del organizador</label>
+      <input id="clave" name="clave" type="password" autocomplete="current-password" maxlength="100">
+    </div>
+    <button type="submit" id="verTodos">Ver todos los videos</button>
+  </form>
+
   <div id="resultados" role="region" aria-live="polite" aria-label="Resultados"></div>
 
   <p class="pie">Los videos se guardan por tiempo limitado; descárgalo pronto.</p>
@@ -76,11 +87,12 @@ window.google = { script: { get run() {
   var ok, mal, o = {
     withSuccessHandler: function (f) { ok = f; return o; },
     withFailureHandler: function (f) { mal = f; return o; },
-    buscarVideos: function (c, n) {
-      fetch(API + '?codigo=' + encodeURIComponent(c) + '&tel=' + encodeURIComponent(n), { credentials: 'omit' })
-        .then(function (r) { return r.json(); }).then(ok, mal);
-    }
+    buscarVideos: function (c, n) { pedir('codigo=' + encodeURIComponent(c) + '&tel=' + encodeURIComponent(n)); },
+    todosVideos: function (k) { pedir('todos=1&clave=' + encodeURIComponent(k)); }
   };
+  function pedir(q) {
+    fetch(API + '?' + q, { credentials: 'omit' }).then(function (r) { return r.json(); }).then(ok, mal);
+  }
   return o;
 } } };
 </script>
@@ -120,7 +132,11 @@ window.google = { script: { get run() {
     a.target = '_blank';
     a.rel = 'noopener';
     a.textContent = 'Descargar';
-    a.addEventListener('click', function (ev) { ev.preventDefault(); descargar(v); });
+    a.addEventListener('click', function (ev) {
+      ev.preventDefault();
+      // Más de ~100 MB: Google muestra una advertencia de virus; en pestaña nueva se ve y se toca "Descargar de todos modos".
+      if (v.tamanoMB >= 95) window.open(v.descarga, '_blank', 'noopener'); else descargar(v);
+    });
     a.setAttribute('aria-label', 'Descargar video ' + v.nombre + (v.tamanoMB ? ' (' + v.tamanoMB + ' MB)' : ''));
     t.appendChild(a);
     return t;
@@ -130,6 +146,8 @@ window.google = { script: { get run() {
   function descargar(v) {
     var f = document.createElement('iframe');
     f.style.display = 'none';
+    // Sin cookies de Google: así Drive no pide la advertencia de virus (invisible en un iframe oculto).
+    f.setAttribute('credentialless', '');
     f.src = v.descarga;
     document.body.appendChild(f);
   }
@@ -198,6 +216,43 @@ window.google = { script: { get run() {
         mensaje('No pudimos conectar. Revisa tu internet e intenta de nuevo.', true);
       })
       .buscarVideos(codigo, numero);
+  });
+
+  // Acceso del organizador: todos los videos del evento con contraseña (se valida en el servidor).
+  var abrirOrg = document.getElementById('abrirOrg');
+  var formOrg = document.getElementById('formOrg');
+  var verTodos = document.getElementById('verTodos');
+  abrirOrg.addEventListener('click', function () {
+    formOrg.hidden = !formOrg.hidden;
+    abrirOrg.setAttribute('aria-expanded', String(!formOrg.hidden));
+    if (!formOrg.hidden) document.getElementById('clave').focus();
+  });
+  formOrg.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var clave = document.getElementById('clave').value;
+    if (!clave) { mensaje('Escribe la contraseña.', true); return; }
+    verTodos.disabled = true;
+    verTodos.textContent = 'Cargando…';
+    mensaje('Cargando todos los videos del evento…', false);
+    function fin() { verTodos.disabled = false; verTodos.textContent = 'Ver todos los videos'; }
+    google.script.run
+      .withSuccessHandler(function (r) {
+        fin();
+        if (!r || r.ok === false) { mensaje((r && r.mensaje) || 'Algo salió mal. Intenta de nuevo.', true); return; }
+        res.textContent = '';
+        var t = document.createElement('p');
+        t.className = 'estado';
+        t.textContent = 'Todos los videos del evento: ' + r.videos.length;
+        res.appendChild(t);
+        var descargas = botonesDescarga(r.videos);
+        if (descargas) res.appendChild(descargas);
+        r.videos.forEach(function (v) { res.appendChild(tarjeta(v)); });
+      })
+      .withFailureHandler(function () {
+        fin();
+        mensaje('No pudimos conectar. Revisa tu internet e intenta de nuevo.', true);
+      })
+      .todosVideos(clave);
   });
 })();
 </script>
